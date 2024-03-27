@@ -1,0 +1,23 @@
+{
+  "short_name": "ViaThis.Link",
+  "name": "ViaThis.Link",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "share_target": {
+    "action": "shared-to",
+    "enctype": "application/x-www-form-urlencoded",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "description",
+      "url": "link"
+    }
+  }
+}
