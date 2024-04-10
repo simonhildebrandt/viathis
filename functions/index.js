@@ -36,7 +36,7 @@ app.use(cors({ origin: true }));
 //   next();
 // });
 
-app.use(authorise(process.env.LWL_KEY));
+app.use(authorise(process.env.LWL_SECRET));
 
 
 const password = process.env.MONGODB_PASSWORD;

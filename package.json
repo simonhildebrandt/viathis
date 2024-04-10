@@ -7,10 +7,11 @@
   "license": "MIT",
   "scripts": {
     "serve": "live-server --port=9000 --entry-file=index.html dev/",
-    "build": "yarn esbuild src/index.jsx --bundle --outfile=dev/index.js",
-    "watch": "yarn esbuild src/index.jsx --bundle --outfile=dev/index.js --watch",
+    "build": "yarn esbuild src/index.jsx --bundle --outfile=dev/index.js --define:LWL_KEY=\"'$LWL_KEY'\" --define:API_HOST=\"'$API_HOST'\"",
+    "watch": "yarn esbuild src/index.jsx --bundle --outfile=dev/index.js --watch --define:LWL_KEY=\"'$LWL_KEY'\" --define:API_HOST=\"'$API_HOST'\"",
     "emulator": "firebase emulators:start",
-    "build_prod": "yarn esbuild src/index.jsx --bundle --outfile=public/index.js"
+    "build_prod": "yarn esbuild src/index.jsx --bundle --outfile=public/index.js --define:LWL_KEY=\"'$LWL_KEY'\" --define:API_HOST=\"'$API_HOST'\"",
+    "deploy_all": "firebase deploy --only functions,hosting"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",

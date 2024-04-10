@@ -8,6 +8,7 @@ import { UserContext, AuthContext } from './auth';
 
 handleToken(token => setToken(token));
 
+const loginKey = LWL_KEY;
 
 const UserOptions = () => {
   const { user, logout } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const UserOptions = () => {
   return <>{ JSON.stringify(user)}
     { user ?
       <button onClick={logout}>Logout</button> :
-      <a href="https://login-with.link//#/login/d35cbfe3-698d-4fa8-a6cf-e8b3dc3b6ba0">Login</a>
+      <a href={`https://login-with.link//#/login/${loginKey}`}>Login</a>
     }
   </>
 }
