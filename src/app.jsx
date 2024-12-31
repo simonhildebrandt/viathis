@@ -1,34 +1,34 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { ChakraProvider, Image } from '@chakra-ui/react'
+import React from 'react';
+import {
+  ChakraProvider,
+  ColorModeScript,
+  Flex,
+} from '@chakra-ui/react'
 
 import { handleToken } from './utils';
 import Routes from './routes';
-import { UserContext, AuthContext } from './auth';
+import { UserContext } from './auth';
+import Header from './header';
+import theme from './theme';
+import ShareButton from './share-button';
 
 
 handleToken(token => setToken(token));
 
-const loginKey = LWL_KEY;
-
-const UserOptions = () => {
-  const { user, logout } = useContext(AuthContext);
-
-  return <>{ JSON.stringify(user)}
-    { user ?
-      <button onClick={logout}>Logout</button> :
-      <a href={`https://login-with.link//#/login/${loginKey}`}>Login</a>
-    }
-  </>
-}
-
 
 export default App = () => {
-  return <ChakraProvider>
-    <a href="/"><Image src="logo.svg"/></a>
-    <a href="/list">list</a>
-    <UserContext waiting="waiting">
-      <UserOptions/>
-      <Routes/>
-    </UserContext>
-  </ChakraProvider>;
+  return <>
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+    <ChakraProvider theme={theme}>
+      <UserContext waiting="waiting">
+        <Flex width="100%" height="100%" direction="column">
+          <Header/>
+          <Flex flexGrow={1} flexShrink={1} overflow="hidden" width="100%">
+            <Routes/>
+            <ShareButton/>
+          </Flex>
+        </Flex>
+      </UserContext>
+    </ChakraProvider>
+  </>
 };

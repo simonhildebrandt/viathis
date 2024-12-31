@@ -1,4 +1,5 @@
 import axios from 'axios';
+import useSWR from 'swr'
 
 let authToken = null;
 
@@ -19,4 +20,10 @@ function setToken(token) {
   authToken = token;
 }
 
-export { api, setToken }
+const fetcher = url => api.get(url).then(res => res.data)
+
+function useAPISWR(path) {
+  return useSWR(path, fetcher);
+}
+
+export { api, useAPISWR, setToken }
