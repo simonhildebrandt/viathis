@@ -1,0 +1,33 @@
+name: Deploy VTL to production
+on:
+  push:
+    branches: master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+      - name: Install yarn and firebase-tools
+        run: |
+          npm install --global yarn firebase-tools
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Install web dependencies
+        run: |
+          yarn install --frozen-lockfile
+      - name: Install function dependencies
+        working-directory: ./functions
+        run: |
+          yarn install --frozen-lockfile
+      - name: Build web
+        run: |
+          yarn build
+      - name: Deploy to Firebase
+        run: |
+          firebase use production
+          firebase deploy --only hosting,functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
