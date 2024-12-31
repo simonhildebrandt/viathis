@@ -5,6 +5,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Set Node.js 18.x
         uses: actions/setup-node@v4
@@ -24,7 +25,7 @@ jobs:
           yarn install --frozen-lockfile
       - name: Build web
         run: |
-          yarn build
+          yarn build_prod
       - name: Deploy to Firebase
         run: |
           firebase deploy --only hosting,functions
