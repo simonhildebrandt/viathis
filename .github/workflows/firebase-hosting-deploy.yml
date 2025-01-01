@@ -26,6 +26,9 @@ jobs:
       - name: Build web
         run: |
           yarn build_prod
+        env:
+          API_HOST: ${{ env.API_HOST }}
+          LWL_KEY: ${{ env.LWL_KEY }}
       - name: Deploy to Firebase
         run: |
           firebase deploy --only hosting,functions
