@@ -29,8 +29,8 @@ jobs:
           echo $LWL_KEY
           yarn build_prod
         env:
-          API_HOST: ${{ env.API_HOST }}
-          LWL_KEY: ${{ env.LWL_KEY }}
+          API_HOST: ${{ vars.API_HOST }}
+          LWL_KEY: ${{ vars.LWL_KEY }}
       - name: Deploy to Firebase
         run: |
           firebase deploy --only hosting,functions
