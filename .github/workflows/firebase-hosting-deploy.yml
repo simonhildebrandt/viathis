@@ -25,6 +25,8 @@ jobs:
           yarn install --frozen-lockfile
       - name: Build web
         run: |
+          echo $API_HOST
+          echo $LWL_KEY
           yarn build_prod
         env:
           API_HOST: ${{ env.API_HOST }}
