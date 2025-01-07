@@ -12,8 +12,8 @@ import { api } from './api';
 
 
 
-function UserTag({id}) {
-  return <div>{id}</div>
+function UserTag({id, name}) {
+  return <div>{name || id}</div>
 }
 
 function EmailTag({email}) {
@@ -27,10 +27,11 @@ export default function({friend, mutate}) {
 
   const {
     _id,
-    createdAt,
     createdBy,
+    createdByName,
     inviteeId,
     inviteeEmail,
+    inviteeName,
     acceptedAt,
     cancelledAt,
     cancelledBy,
@@ -38,10 +39,10 @@ export default function({friend, mutate}) {
 
   let them, canAccept = false, canUncancel = false;
   if (createdBy === lwlId) {
-    them = { id: inviteeId, email: inviteeEmail };
+    them = { id: inviteeId, email: inviteeEmail, name: inviteeName };
     canUncancel = cancelledAt && cancelledBy == lwlId;
   } else {
-    them = { id: createdBy };
+    them = { id: createdBy, name: createdByName };
     canAccept = !acceptedAt || cancelledBy == lwlId;
   }
 

@@ -4,6 +4,7 @@ import {
   Link,
   Heading,
   Tooltip,
+  Skeleton,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { getRouter } from "navigo-react";
@@ -25,7 +26,7 @@ function ItemDate({date}) {
   </Tooltip>
 }
 
-function Item({item}) {
+function Item({item, mutate}) {
   const { _id, title, link, description, createdAt } = item;
   const hoverColor = useColorModeValue('white', 'gray.600');
 
@@ -53,12 +54,12 @@ function Item({item}) {
         <Heading size="md">{title}</Heading>
         <Flex py={1} direction="column" gap={2}>
           <Flex>{description}</Flex>
-          <Link href={link}>{link}</Link>
+          <Link href={link} isExternal>{link}</Link>
         </Flex>
       </Flex>
     </Flex>
     <Flex>
-      <ItemControls item={item}/>
+      <ItemControls item={item} mutate={mutate}/>
     </Flex>
   </Flex>
 }
@@ -82,11 +83,20 @@ export default function FolderList({folder}) {
         flexGrow={1}
         flexShrink={1}
       >
-        { isLoading == false && data && data.length == 0 && <Heading size="md">No items in this folder</Heading> }
-        { data && data.map(item => <Item
+        { isLoading == false && data && data.length == 0 && (
+          <Flex p={8} justify="center">
+            <Heading color="gray" size="md">No items in this folder</Heading>
+          </Flex>
+        )}
+        { data ? data.map(item => <Item
           key={item._id}
           item={item}
-        />) }
+          mutate={mutate}
+        />) : (
+          <>
+            { Array.from({length: 5}).map((_, i) => <Skeleton key={i} height={16}/>) }
+          </>
+        )}
       </Flex>
     </ListProvider>
   </Flex>

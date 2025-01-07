@@ -100,10 +100,9 @@ app.post("/create", async (req, res) => {
   const owner = req.auth.sub;
   const doc = { title, description, link, createdAt, owner };
 
-  console.log({doc});
-
   try {
     links.insertOne(doc);
+    return res.status(201).json({ message: "created" });
   } catch(error) {
     console.error(error);
     res.status(500).json({message: error.message});
@@ -111,8 +110,6 @@ app.post("/create", async (req, res) => {
     // Ensures that the client will close when you finish/error
     await client.close();
   }
-
-  return res.status(200).json({ name: "Simon" });
 });
 
 app.get("/user/:id", async (req, res) => {
@@ -222,8 +219,27 @@ app.get("/friends", async (req, res) => {
     };
 
     const cursor = await friends.find(query);
-    const result = await cursor.toArray();
-    res.status(200).json(result);
+    const friendList = await cursor.toArray();
+
+    const userIds = friendList.map(friend => friend.createdBy).concat(friendList.map(friend => friend.inviteeId));
+
+    const users = database.collection('users');
+    const userQuery = { lwlId: { $in: userIds } };
+    const userCursor = await users.find(userQuery);
+    const userList = await userCursor.toArray();
+    const userLookup = Object.fromEntries(userList.map(user => [user.lwlId, user.name]));
+
+    friendList.forEach(friend => {
+      friend.createdByName = userLookup[friend.createdBy] || friend.createdBy;
+      friend.inviteeName = userLookup[friend.inviteeId] || friend.inviteeId;
+      friend.them = friend.createdBy === userId ?
+        { id: friend.inviteeId, idOrName: friend.inviteeName }
+      :
+        { id: friend.createdBy, idOrName: friend.createdByName };
+      friend.them.active = friend.acceptedAt && !friend.cancelledAt;
+    });
+
+    res.status(200).json(friendList);
   } catch(error) {
     console.error(error);
     res.status(500).json({message: error.message});
@@ -273,7 +289,14 @@ app.post("/friends/:id", async (req, res) => {
   try {
     // TODO check that user is in the friend request
 
+    const query1 = { _id: new ObjectId(id) };
+    const friend = await friends.findOne(query1);
+
     const doc = {};
+    // Update the friend request with inviteeId in case we only have email
+    if (friend.createdBy !== req.auth.sub){
+      doc.inviteeId = req.auth.sub;
+    }
 
     if (action == 'accept') {
       doc.acceptedAt = new Date();
@@ -287,8 +310,8 @@ app.post("/friends/:id", async (req, res) => {
       doc.cancelledBy = null;
     }
 
-    const query = { _id: new ObjectId(id) };
-    await friends.updateOne(query, { $set: doc });
+    const query2 = { _id: new ObjectId(id) };
+    await friends.updateOne(query2, { $set: doc });
     res.status(200).json({});
   } catch(error) {
     console.error(error);
@@ -298,5 +321,39 @@ app.post("/friends/:id", async (req, res) => {
     await client.close();
   }
 });
+
+app.post("/share/:id", async (req, res) => {
+  const { client, database } = getClientAndDatabase();
+  const links = database.collection('links');
+
+  // TODO verify friends
+
+  const { id } = req.params;
+  const { userId: owner, shareMessage } = req.body;
+  const sharedBy = req.auth.sub;
+
+  const query1 = { _id: new ObjectId(id) };
+  const link = await links.findOne(query1);
+
+  if (!link) {
+    return res.status(404).json({message: 'link not found'});
+  }
+
+  const createdAt = new Date();
+  const newDoc = {...link, _id: null, createdAt, owner, sharedBy, shareMessage };
+
+  try {
+    const result = await links.insertOne(newDoc);
+    console.log({result})
+    res.status(201).json({message: "created"});
+  } catch(error) {
+    console.error(error);
+    res.status(500).json({message: "Error creating link."});
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+
+})
 
 exports.api = functions.https.onRequest(app);

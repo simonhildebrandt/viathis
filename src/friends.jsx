@@ -5,6 +5,7 @@ import {
   FormControl,
   Input,
   Button,
+  Skeleton,
   useToast,
 } from '@chakra-ui/react';
 
@@ -47,7 +48,9 @@ export default function() {
       </form>
     </Flex>
     <Flex gap={4} flexWrap="wrap" align="stretch">
-      {friends && friends.map(friend => <FriendLink key={friend._id} friend={friend} mutate={mutate}/>)}
+      {friends ? friends.map(friend => <FriendLink key={friend._id} friend={friend} mutate={mutate}/>) : (
+        Array.from({length: 5}).map((_, i) => <Skeleton key={i} height={32} width="256px"/>)
+      )}
     </Flex>
   </Flex>
 }

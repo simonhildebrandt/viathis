@@ -1,22 +1,28 @@
 import React, { useContext } from 'react';
 import {
   IconButton,
+  Flex,
 } from '@chakra-ui/react';
-import { MdArchive, MdMoveToInbox } from "react-icons/md";
+import { MdArchive, MdMoveToInbox, MdShare } from "react-icons/md";
+import { getRouter } from "navigo-react";
 
 import { api } from './api';
-import { ListContext } from './folder-context';
 
 
-export default function({ item }) {
+export default function({ item, mutate }) {
   const { _id, archived } = item;
-  const { mutate } = useContext(ListContext);
 
   const archive = _ => api.post(`/item/${_id}/archive`).then(_ => mutate());
   const inbox = _ => api.post(`/item/${_id}/inbox`).then(_ => mutate());
+  const share = _ => getRouter().navigate(`item/${_id}/share`);
 
-  return archived == true ?
-    <IconButton icon={<MdMoveToInbox onClick={inbox} size={24}/>}/>
-    :
-    <IconButton icon={<MdArchive onClick={archive} size={24}/>}/>
+  return <Flex direction="column" gap={2}>
+    { archived == true ?
+      <IconButton icon={<MdMoveToInbox onClick={inbox} size={24}/>}/>
+      :
+      <IconButton icon={<MdArchive onClick={archive} size={24}/>}/>
+
+    }
+    <IconButton icon={<MdShare onClick={share} size={24}/>}/>
+  </Flex>
 }

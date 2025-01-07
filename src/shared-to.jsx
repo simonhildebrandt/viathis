@@ -74,11 +74,14 @@ export default SharedTo = () => {
         <FormLabel>Description</FormLabel>
         <Input value={newDescription} onChange={setFromEvent(setDescription)}/>
       </FormControl>
-      { !submitted ? (
-        <Alert status='success'>
-          <AlertIcon />
-          <AlertTitle>Link saved!</AlertTitle>
-        </Alert>
+      { submitted ? (
+        <Flex direction="column" gap={4}>
+          <Alert status='success'>
+            <AlertIcon />
+            <AlertTitle>Link saved!</AlertTitle>
+          </Alert>
+          <Link fontWeight="bold" href="/list/inbox">View your inbox.</Link>
+        </Flex>
       ) : (
         <Button type="submit" onClick={handleSubmit}>Submit</Button>
       ) }
