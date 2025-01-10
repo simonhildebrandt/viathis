@@ -12,3 +12,4 @@ dev/index.js
 public/index.js
 
 mongodb-credentials.txt
+functions/.env
