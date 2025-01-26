@@ -1,10 +1,13 @@
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useRef, useEffect, useState } from 'react'
 import {
   Image,
   IconButton,
   Button,
   useColorMode,
   Flex,
+  Input,
+  FormControl,
+  FormLabel,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -14,15 +17,38 @@ import {
   DrawerCloseButton,
   useDisclosure,
 } from '@chakra-ui/react'
-import { SunIcon, MoonIcon, SettingsIcon } from '@chakra-ui/icons'
+import { SunIcon, MoonIcon, SettingsIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
 
 import { AuthContext } from './auth';
+import { api } from './api';
 
 
 const UserOptions = () => {
   const { user, logout } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [newName, setNewName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const btnRef = useRef();
+
+  useEffect(() => {
+    if (user) {
+      setNewName(user.name);
+    }
+  }, [user]);
+
+  function updateName(event) {
+    setNewName(event.target.value)
+  }
+
+  function resetName() {
+    setNewName(user.name)
+  }
+
+  async function saveName() {
+    setIsLoading(true);
+    await api.post('/profile/name', { name: newName });
+    setIsLoading(false);
+  }
 
   if (!user) return;
 
@@ -41,10 +67,30 @@ const UserOptions = () => {
           <DrawerHeader>
             <Flex align="center" gap={2}>
               <SettingsIcon/>
-              {user.name} - {user.email}
+              {user.email}
             </Flex>
           </DrawerHeader>
           <DrawerBody>
+          <FormControl>
+            <FormLabel>Name</FormLabel>
+            <Flex gap={2}>
+              <Input type='text' value={newName} onChange={updateName} />
+              <IconButton
+                colorScheme="green"
+                isDisabled={newName === user.name}
+                icon={<CheckIcon/>}
+                isLoading={isLoading}
+                onClick={saveName}
+              />
+              <IconButton
+                colorScheme="red"
+                isDisabled={newName === user.name}
+                icon={<CloseIcon/>}
+                isLoading={isLoading}
+                onClick={resetName}
+              />
+            </Flex>
+          </FormControl>
           </DrawerBody>
           <DrawerFooter>
             <Button onClick={logout}>Logout</Button>

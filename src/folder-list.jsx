@@ -65,7 +65,7 @@ function Item({item, mutate}) {
 }
 
 export default function FolderList({folder}) {
-  const { data, error, isLoading, mutate } = useAPISWR(`/list/${folder}`, {revalidateOnFocus: false});
+  const { data, isLoading, mutate } = useAPISWR(`/list/${folder}`, {revalidateOnFocus: false});
   const bgColor = useColorModeValue('gray.100', 'gray.700');
 
   return <Flex

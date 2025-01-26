@@ -91,6 +91,22 @@ app.get("/profile", async (req, res) => {
   }
 });
 
+app.post("/profile/name", async (req, res) => {
+  const { client, database } = getClientAndDatabase();
+  const users = database.collection('users');
+  const { name } = req.body;
+
+  try {
+    const user = await ensureUser(req.auth.sub, req.auth);
+    const result = await users.updateOne({lwlId: { $eq: req.auth.sub }}, { $set: { name } });
+
+    return res.status(200).json({updated: true});
+  } catch(error) {
+    console.error(error);
+    res.status(500).json({message: error.message});
+  }
+});
+
 app.post("/create", async (req, res) => {
   const { client, database } = getClientAndDatabase();
   const links = database.collection('links');
