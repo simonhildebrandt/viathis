@@ -33,28 +33,28 @@ function Item({item, mutate}) {
   const displayItem = _ => getRouter().navigate(`/item/${_id}`);
 
   return <Flex
-    direction="row"
-    gap={4}
+    direction={"row"}
+    gap={[4, 8]}
     align="flex-start"
   >
     <Flex
       direction="row"
-      gap={4}
+      gap={[4, 8]}
       align="center"
       flexGrow={1}
       flexShrink={1}
       borderRadius={16}
       cursor="pointer"
-      p={6}
+      p={[4, 6]}
       _hover={{ backgroundColor: hoverColor }}
       onClick={displayItem}
     >
       <ItemDate date={createdAt}/>
       <Flex direction="column" flexShrink={1} flexGrow={1}>
-        <Heading size="md">{title}</Heading>
-        <Flex py={1} direction="column" gap={2}>
-          <Flex>{description}</Flex>
-          <Link href={link} isExternal>{link}</Link>
+        <Heading wordBreak="break-all" fontSize={[16, 20]}>{title}</Heading>
+        <Flex minWidth="0" flex={1} fontSize={[12, 14]} py={1} direction="column" gap={2}>
+          <Flex wordBreak="break-all">{description}</Flex>
+          <Link wordBreak="break-all" href={link} isExternal>{link}</Link>
         </Flex>
       </Flex>
     </Flex>
@@ -78,8 +78,7 @@ export default function FolderList({folder}) {
     <ListProvider mutate={mutate}>
       <Flex
         direction="column"
-        gap={4}
-        p={4}
+        p={[2, 4]}
         flexGrow={1}
         flexShrink={1}
       >

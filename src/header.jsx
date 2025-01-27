@@ -8,6 +8,7 @@ import {
   Input,
   FormControl,
   FormLabel,
+  Switch,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -71,26 +72,34 @@ const UserOptions = () => {
             </Flex>
           </DrawerHeader>
           <DrawerBody>
-          <FormControl>
-            <FormLabel>Name</FormLabel>
-            <Flex gap={2}>
-              <Input type='text' value={newName} onChange={updateName} />
-              <IconButton
-                colorScheme="green"
-                isDisabled={newName === user.name}
-                icon={<CheckIcon/>}
-                isLoading={isLoading}
-                onClick={saveName}
-              />
-              <IconButton
-                colorScheme="red"
-                isDisabled={newName === user.name}
-                icon={<CloseIcon/>}
-                isLoading={isLoading}
-                onClick={resetName}
-              />
+            <Flex gap={4} direction="column">
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+                <Flex gap={2}>
+                  <Input type='text' value={newName} onChange={updateName} />
+                  <IconButton
+                    colorScheme="green"
+                    isDisabled={newName === user.name}
+                    icon={<CheckIcon/>}
+                    isLoading={isLoading}
+                    onClick={saveName}
+                  />
+                  <IconButton
+                    colorScheme="red"
+                    isDisabled={newName === user.name}
+                    icon={<CloseIcon/>}
+                    isLoading={isLoading}
+                    onClick={resetName}
+                  />
+                </Flex>
+              </FormControl>
+              <FormControl display='flex' alignItems='center'>
+                <FormLabel htmlFor='notifications' mb='0'>
+                  Enable share notifications?
+                </FormLabel>
+                <Switch id='notifications' isChecked={true} onChange={e => console.log({e})} />
+              </FormControl>
             </Flex>
-          </FormControl>
           </DrawerBody>
           <DrawerFooter>
             <Button onClick={logout}>Logout</Button>
