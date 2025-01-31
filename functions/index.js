@@ -111,10 +111,10 @@ app.post("/create", async (req, res) => {
   const { client, database } = getClientAndDatabase();
   const links = database.collection('links');
 
-  const { title, description, link } = req.body;
+  const { title, description, link, tags: [] } = req.body;
   const createdAt = new Date();
   const owner = req.auth.sub;
-  const doc = { title, description, link, createdAt, owner };
+  const doc = { title, description, link, createdAt, owner, tags, archived: false };
 
   try {
     links.insertOne(doc);
