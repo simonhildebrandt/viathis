@@ -14,45 +14,39 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { api } from './api';
+import LinkForm from './link-form';
 
-
-const setFromEvent = setter => event => setter(event.target.value);
 
 export default SharedTo = () => {
   const { match } = useNavigo();
-
-  const [newTitle, setTitle] = useState('');
-  const [newDescription, setDescription] = useState('');
-  const [newLink, setLink] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const { params } = match;
+  const [data, setData] = useState({});
 
-  useEffect(_ => {
-    const { title = '', description = '', link = '' } = params || {};
+  const { title = '', description = '', link = '' } = params || {};
 
-    setTitle(title.replace(/\+/g, " "));
-    setDescription(description);
+  const cleanTitle = title.replace(/\+/g, " ");
+  const cleanDescription = description;
 
-    let t;
+  let t;
+  try {
+    t = new URL(link).href;
+  } catch {
     try {
-      t = new URL(link).href;
+      t = new URL(title).href;
     } catch {
       try {
-        t = new URL(title).href;
+        t = new URL(description).href;
       } catch {
-        try {
-          t = new URL(description).href;
-        } catch {
-          t = '';
-        }
+        t = '';
       }
     }
-    setLink(t);
-  }, []);
+  }
+  const cleanLink = t;
 
   async function handleSubmit() {
     try {
-      await api.post('/create', { title: newTitle, description: newDescription, link: newLink });
+      await api.post('/create', data);
       setSubmitted(true);
     } catch(err) {
 
@@ -62,18 +56,7 @@ export default SharedTo = () => {
   return <>
     <Flex direction="column" gap={2} minWidth={320} maxWidth={320} mx="auto">
       <Heading size="md">Save a link</Heading>
-      <FormControl>
-        <FormLabel>Title</FormLabel>
-        <Input value={newTitle} onChange={setFromEvent(setTitle)}/>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Link</FormLabel>
-        <Input value={newLink} onChange={setFromEvent(setLink)}/>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Description</FormLabel>
-        <Input value={newDescription} onChange={setFromEvent(setDescription)}/>
-      </FormControl>
+      <LinkForm onDataChanged={setData} title={cleanTitle} description={cleanDescription} link={cleanLink} tags={['untagged']}/>
       { submitted ? (
         <Flex direction="column" gap={4}>
           <Alert status='success'>

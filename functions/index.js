@@ -104,6 +104,9 @@ app.post("/profile/name", async (req, res) => {
   } catch(error) {
     console.error(error);
     res.status(500).json({message: error.message});
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
   }
 });
 
@@ -111,7 +114,7 @@ app.post("/create", async (req, res) => {
   const { client, database } = getClientAndDatabase();
   const links = database.collection('links');
 
-  const { title, description, link, tags: [] } = req.body;
+  const { title, description, link, tags = [] } = req.body;
   const createdAt = new Date();
   const owner = req.auth.sub;
   const doc = { title, description, link, createdAt, owner, tags, archived: false };
@@ -208,6 +211,33 @@ app.post("/item/:id/inbox", async (req, res) => {
     const query = { _id: new ObjectId(id) };
 
     const result = await links.updateOne(query, { $set: { archived: false } });
+    res.status(200).json(result);
+  } catch(error) {
+    console.error(error);
+    res.status(500).json({message: error.message});
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+});
+
+app.post("/item/:id", async (req, res) => {
+  const { client, database } = getClientAndDatabase();
+  const links = database.collection('links');
+
+  const { id } = req.params;
+  const { tags, title, description, link } = req.body;
+
+  const data = {};
+  if (tags) data.tags = tags;
+  if (link) data.link = link;
+  if (title) data.title = title;
+  if (description) data.description = description;
+
+  try {
+    const query = { _id: new ObjectId(id) };
+
+    const result = await links.updateOne(query, { $set: data });
     res.status(200).json(result);
   } catch(error) {
     console.error(error);

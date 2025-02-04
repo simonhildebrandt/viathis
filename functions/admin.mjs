@@ -15,13 +15,7 @@ async function updateAll() {
     [
       {
           $set: {
-              title: {
-                  $replaceAll: {
-                      input: "$title", // The field to modify
-                      find: "+",
-                      replacement: " " // Replace '+' with space
-                  }
-              }
+              tags: ['untagged']
           }
       }
   ]
@@ -47,5 +41,5 @@ async function findAll() {
 }
 
 
-await deleteAll();
+await updateAll();
 await findAll();

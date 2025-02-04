@@ -12,6 +12,7 @@ import { getRouter } from "navigo-react";
 import ItemControls from './item-controls';
 import { useAPISWR } from './api';
 import { ListProvider } from './folder-context';
+import Tags from './tags';
 
 
 const pad = str => str.toString().padStart(2, '0');
@@ -27,7 +28,7 @@ function ItemDate({date}) {
 }
 
 function Item({item, mutate}) {
-  const { _id, title, link, description, createdAt } = item;
+  const { _id, title, link, description, createdAt, tags } = item;
   const hoverColor = useColorModeValue('white', 'gray.600');
 
   const displayItem = _ => getRouter().navigate(`/item/${_id}`);
@@ -52,6 +53,7 @@ function Item({item, mutate}) {
       <ItemDate date={createdAt}/>
       <Flex direction="column" flexShrink={1} flexGrow={1}>
         <Heading wordBreak="break-all" fontSize={[16, 20]}>{title}</Heading>
+        <Tags tags={tags}/>
         <Flex minWidth="0" flex={1} fontSize={[12, 14]} py={1} direction="column" gap={2}>
           <Flex wordBreak="break-all">{description}</Flex>
           <Link wordBreak="break-all" href={link} isExternal>{link}</Link>
