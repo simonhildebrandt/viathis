@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import {
   Flex,
   Link,
   Heading,
   Tooltip,
   Skeleton,
+  Input,
+  IconButton,
+  FormControl,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { getRouter } from "navigo-react";
@@ -51,7 +54,7 @@ function Item({item, mutate}) {
       onClick={displayItem}
     >
       <ItemDate date={createdAt}/>
-      <Flex direction="column" flexShrink={1} flexGrow={1}>
+      <Flex gap={2} direction="column" flexShrink={1} flexGrow={1}>
         <Heading wordBreak="break-all" fontSize={[16, 20]}>{title}</Heading>
         <Tags tags={tags}/>
         <Flex minWidth="0" flex={1} fontSize={[12, 14]} py={1} direction="column" gap={2}>
@@ -66,9 +69,17 @@ function Item({item, mutate}) {
   </Flex>
 }
 
-export default function FolderList({folder}) {
-  const { data, isLoading, mutate } = useAPISWR(`/list/${folder}`, {revalidateOnFocus: false});
+export default function FolderList({folder, tag}) {
+  const [search, setSearch] = useState('');
+  const params = new URLSearchParams();
+  Object.entries({folder, tag, search}).forEach(([key, value]) => value && params.set(key, value))
+  const { data, isLoading, mutate } = useAPISWR(`/list/?${params.toString()}`, {revalidateOnFocus: false});
   const bgColor = useColorModeValue('gray.100', 'gray.700');
+  const searchBg = useColorModeValue('white', 'gray.700');
+
+  function updateSearch(e) {
+    setSearch(e.target.value);
+  }
 
   return <Flex
     overflowY="auto"
@@ -78,6 +89,13 @@ export default function FolderList({folder}) {
     flexShrink={1}
   >
     <ListProvider mutate={mutate}>
+      {folder == 'search' && <Flex bgColor={searchBg} m={2} p={2} gap={2}>
+        <FormControl>
+          <Input value={search} onChange={updateSearch} placeholder="search"/>
+        </FormControl>
+        {/* <IconButton icon={<MdOutlineSearch/>} /> */}
+      </Flex>
+      }
       <Flex
         direction="column"
         p={[2, 4]}

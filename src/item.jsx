@@ -21,7 +21,7 @@ import LinkForm from './link-form';
 export default function Item({ item, action }) {
   const { data: itemData, mutate } = useAPISWR(`/item/${item}`);
   const { isOpen, onClose } = useDisclosure({defaultIsOpen: action == '/share'})
-  const { isOpen: isEditing, onOpen: onEditingOpen, onClose: onEditingClose } = useDisclosure({defaultIsOpen: true});
+  const { isOpen: isEditing, onOpen: onEditingOpen, onClose: onEditingClose } = useDisclosure({defaultIsOpen: action == '/edit'});
   const [data, setData] = useState({});
 
   function hide() {
@@ -32,8 +32,7 @@ export default function Item({ item, action }) {
   async function handleSubmit() {
     try {
       await api.post(`/item/${item}`, data);
-      onEditingClose();
-      mutate();
+      getRouter().navigate(`/item/${item}`);
     } catch(err) {
 
     }
@@ -57,7 +56,7 @@ export default function Item({ item, action }) {
       <LinkForm onDataChanged={setData} title={title} description={description} link={link} tags={tags}/>
       <Flex justify="flex-end" gap={4}>
         <Button colorScheme="green" onClick={handleSubmit}>Save</Button>
-        <Button colorScheme="red" onClick={onEditingClose}>Cancel</Button>
+        <Button colorScheme="red" onClick={hide}>Cancel</Button>
       </Flex>
     </Flex>
   }
@@ -81,7 +80,6 @@ export default function Item({ item, action }) {
     <ItemControls
       item={{_id: item, archived}}
        mutate={mutate}
-       onEdit={onEditingOpen}
     />
   </Flex>
 }

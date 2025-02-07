@@ -47,8 +47,8 @@ function getClientAndDatabase() {
 }
 
 function userData(user) {
-  const { lwlId, email, name } = user;
-  return { lwlId, email, name };
+  const { lwlId, email, name, tags } = user;
+  return { lwlId, email, name, tags };
 }
 
 async function ensureUser(lwlId, details = null) {
@@ -67,13 +67,14 @@ async function ensureUser(lwlId, details = null) {
         lwlId,
         email,
         name,
+        tags: []
       };
 
       await users.insertOne(doc);
 
       return doc;
     } else {
-      return { email: 'unknown', name: `user${lwlId}` };
+      return { email: 'unknown', name: `user${lwlId}`, tags: [] };
     }
   } finally {
     // Ensures that the client will close when you finish/error
@@ -91,14 +92,20 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-app.post("/profile/name", async (req, res) => {
+app.post("/profile", async (req, res) => {
   const { client, database } = getClientAndDatabase();
   const users = database.collection('users');
-  const { name } = req.body;
+  const { name, tags } = req.body;
+
+  // TODO: user must own profile
+
+  let data = {};
+  if (name) data.name = name;
+  if (tags) data.tags = tags;
 
   try {
     const user = await ensureUser(req.auth.sub, req.auth);
-    const result = await users.updateOne({lwlId: { $eq: req.auth.sub }}, { $set: { name } });
+    const result = await users.updateOne({lwlId: { $eq: req.auth.sub }}, { $set: data });
 
     return res.status(200).json({updated: true});
   } catch(error) {
@@ -136,19 +143,34 @@ app.get("/user/:id", async (req, res) => {
   return res.status(200).json(userData(user));
 });
 
-app.get("/list/:folder", async (req, res) => {
+app.get("/list", async (req, res) => {
   const { client, database } = getClientAndDatabase();
   const links = database.collection('links');
 
-  const archived = req.params.folder === 'archived';
+  let query = {};
+  const { folder, search, tag } = req.query;
+
+  console.log({ folder, search, tag })
+
+  if (folder === 'inbox') query.archived ={ $eq: false };
+  if (folder === 'archived') query.archived ={ $eq: true };
+  if (search) {
+    query = {
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $elemMatch: { $eq: search } } },
+      ]
+    }
+  }
+  if (tag) {
+    query = { tags: { $elemMatch: { $eq: tag } } }
+  }
+
+  query.owner = { $eq: req.auth.sub };
 
   try {
-    const query = {
-      owner: { $eq: req.auth.sub },
-      archived: { $eq: archived }
-    };
-    const options = { sort: { createdAt: 1 } };
-
+    const options = { sort: { createdAt: -1 } };
     const cursor = links.find(query, options);
     const result = await cursor.toArray();
     res.status(200).json(result);

@@ -53,8 +53,9 @@ function Intro({user}) {
 }
 
 function WithMatch({children}) {
-  const { match } = useNavigo();
-  return children(match.data);
+  const { match, ...rest } = useNavigo();
+  const { data, url } = match;
+  return children({ ...data, url });
 }
 
 export default function Routes() {
@@ -73,21 +74,28 @@ export default function Routes() {
 
   return <Switch>
     <Route path="/add" before={userRequired}>
-      <ListLayout folder={null}><SharedTo/></ListLayout>
+      <ListLayout current={null}><SharedTo/></ListLayout>
     </Route>
     <Route path="/list/:folder" before={userRequired}>
       <WithMatch>
-        { ({folder}) => <ListLayout folder={folder}><List folder={folder}/></ListLayout> }
+        { ({folder, url}) => <ListLayout folder={folder} url={url}><List folder={folder}/></ListLayout> }
+      </WithMatch>
+    </Route>
+    <Route path="/tag/:tag" before={userRequired}>
+      <WithMatch>
+        { ({tag, url}) => <ListLayout tag={tag} url={url}><List tag={tag}/></ListLayout> }
       </WithMatch>
     </Route>
     <Route path="/item/:item(/:action)?" before={userRequired}>
       <WithMatch>
-        { ({item, action}) => <ListLayout folder={null}><Item item={item} action={action}/></ListLayout> }
+        { ({item, action, url}) => <ListLayout url={url}><Item item={item} action={action}/></ListLayout> }
       </WithMatch>
     </Route>
     <Route path="/friends" before={userRequired}>
-      <ListLayout folder={null} page="friends"><Friends/></ListLayout>
-    </Route>
+    <WithMatch>
+      { ({item, action, url}) => <ListLayout url={url} page="friends"><Friends/></ListLayout> }
+    </WithMatch>
+      </Route>
     <Route path="/login">
       <Redirect path={nextUserPath}/>
     </Route>

@@ -18,7 +18,7 @@ import { getRouter } from "navigo-react";
 import { MdMenu } from "react-icons/md";
 
 import { FolderContext, FolderProvider } from "./folder-context";
-
+import { AuthContext } from './auth';
 
 
 function WithNavDrawer({children}) {
@@ -49,13 +49,11 @@ function WithNavDrawer({children}) {
 }
 
 
-function NavLink({children, name, page, current}) {
+function NavLink({children, path}) {
   const nav = () => getRouter().navigate(path);
+  const { folder, url } = useContext(FolderContext);
 
-  const { folder } = useContext(FolderContext);
-  const path = page || `/list/${name}`;
-
-  const selected = folder === name || (page && page === current);
+  const selected = path == url;
   const highlightColor = 'gray.500';
 
   return <Flex
@@ -68,18 +66,26 @@ function NavLink({children, name, page, current}) {
   </Flex>
 }
 
-export default function({folder, page, children}) {
-  return <FolderProvider folder={folder}>
+export default function({url, folder, children}) {
+  const { user: { tags } } = useContext(AuthContext);
+  const extendedTags = [...tags, 'untagged'];
+
+  return <FolderProvider folder={folder} url={url}>
     <Flex width="100%" position="relative">
       <WithNavDrawer>
         <Flex direction="column" p={8} fontWeight="bold" gap={6}>
           <Flex direction="column" gap={2}>
-            <NavLink name="inbox">Inbox</NavLink>
-            <NavLink name="archived">Archived</NavLink>
-            <NavLink name="search">Search</NavLink>
+            <NavLink path="list/inbox">Inbox</NavLink>
+            <NavLink path="list/archived">Archived</NavLink>
+            <NavLink path="list/search">Search</NavLink>
+          </Flex>
+          <Flex direction="column" gap={2}>
+            { extendedTags.map(tag => (
+              <NavLink key={tag} path={`tag/${encodeURIComponent(tag)}`}>{tag}</NavLink>
+            )) }
           </Flex>
           <Flex>
-            <NavLink current={page} page="friends">Friends</NavLink>
+            <NavLink path="friends">Friends</NavLink>
           </Flex>
         </Flex>
       </WithNavDrawer>

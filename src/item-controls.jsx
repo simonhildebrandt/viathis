@@ -9,12 +9,13 @@ import { getRouter } from "navigo-react";
 import { api } from './api';
 
 
-export default function({ item, mutate, editing, onEdit, onSave, onClose }) {
+export default function({ item, mutate, editing, onSave, onClose }) {
   const { _id, archived } = item;
 
   const archive = _ => api.post(`/item/${_id}/archive`).then(_ => mutate());
   const inbox = _ => api.post(`/item/${_id}/inbox`).then(_ => mutate());
   const share = _ => getRouter().navigate(`item/${_id}/share`);
+  const edit = _ => getRouter().navigate(`item/${_id}/edit`);
 
   return <Flex direction="column" gap={2}>
     { archived == true ?
@@ -24,6 +25,6 @@ export default function({ item, mutate, editing, onEdit, onSave, onClose }) {
 
     }
     <IconButton icon={<MdShare onClick={share} size={24}/>}/>
-    <IconButton icon={<MdEdit onClick={onEdit} size={24}/>}/>
+    <IconButton icon={<MdEdit onClick={edit} size={24}/>}/>
   </Flex>
 }

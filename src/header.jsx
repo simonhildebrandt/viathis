@@ -22,6 +22,7 @@ import { SunIcon, MoonIcon, SettingsIcon, CheckIcon, CloseIcon } from '@chakra-u
 
 import { AuthContext } from './auth';
 import { api } from './api';
+import TagEditor from './tag-editor';
 
 
 const UserOptions = () => {
@@ -47,11 +48,17 @@ const UserOptions = () => {
 
   async function saveName() {
     setIsLoading(true);
-    await api.post('/profile/name', { name: newName });
+    await api.post('/profile', { name: newName });
     setIsLoading(false);
   }
 
+  async function saveTags(tags) {
+    await api.post('/profile', { tags });
+  }
+
   if (!user) return;
+
+  const { tags } = user;
 
   return <>
     <Button ref={btnRef} onClick={onOpen}>{user.name}</Button>
@@ -91,6 +98,14 @@ const UserOptions = () => {
                     isLoading={isLoading}
                     onClick={resetName}
                   />
+                </Flex>
+              </FormControl>
+              <FormControl display='flex' alignItems='center'>
+                <FormLabel htmlFor='tags' mb='0'>
+                  Favourite tags
+                </FormLabel>
+                <Flex flexGrow={1} direction="column">
+                  <TagEditor tags={tags} onChange={saveTags}/>
                 </Flex>
               </FormControl>
               <FormControl display='flex' alignItems='center'>

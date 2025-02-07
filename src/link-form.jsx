@@ -20,7 +20,6 @@ export default function({title, description, link, tags, onDataChanged}) {
   };
 
   useEffect(_ => {
-    console.log('here')
     onDataChanged({
       title: newTitle,
       description: newDescription,
