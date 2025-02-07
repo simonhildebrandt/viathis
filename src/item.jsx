@@ -70,10 +70,10 @@ export default function Item({ item, action }) {
         { sharedBy && <Flex>
           <Text fontStyle="italic">Shared by {sharedBy}{ shareMessage && `- ${shareMessage}`}</Text>
         </Flex> }
-        <Text>{new Date(createdAt).toLocaleString()}</Text>
+        <Text fontSize="xs">{new Date(createdAt).toLocaleString()}</Text>
         <Tags tags={tags}/>
-        <Link href={link} isExternal>{link}</Link>
         <Text>{description}</Text>
+        <Link href={link} isExternal>{link}</Link>
       </Flex>
     </Flex>
 
